@@ -1,26 +1,13 @@
 # rag.py
 from openai import OpenAI
+import streamlit as st
 from embedder import embed_query
-from vector_store import load_vector_store
-import numpy as np
-import os
+from vector_store import search_vector_store
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-def retrieve_context(query, top_k=3):
-    index, metadata = load_vector_store()
-    if index is None:
-        return []
-
-    query_embedding = embed_query(query)
-    distances, indices = index.search(
-        np.array([query_embedding]), top_k
-    )
-
-    return [metadata[i] for i in indices[0]]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def generate_answer(query):
-    contexts = retrieve_context(query)
+    contexts = search_vector_store(embed_query(query))
 
     if not contexts:
         return "No policy documents found. Please upload documents first.", []
@@ -41,9 +28,7 @@ Question:
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
+        messages=[{"role": "user", "content": prompt}],
         temperature=0
     )
 

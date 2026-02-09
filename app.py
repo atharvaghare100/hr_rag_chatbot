@@ -49,8 +49,13 @@ if process_clicked:
                 all_chunks.extend(chunks)
                 metadata.extend(chunks)
 
-            embeddings = embed_texts(all_chunks)
-            save_vector_store(np.array(embeddings), metadata)
+            if not all_chunks:
+                 st.sidebar.error("No text could be extracted from the uploaded PDFs.")
+            else:
+                embeddings = embed_texts(all_chunks)
+                save_vector_store(embeddings, metadata)
+                st.sidebar.success("Documents processed successfully!")
+
 
         st.sidebar.success("Documents processed successfully!")
 

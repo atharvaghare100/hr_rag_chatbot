@@ -1,7 +1,11 @@
-streamlit>=1.30
+streamlit
 openai>=1.0.0
+
 sentence-transformers==2.2.2
+huggingface-hub==0.16.4
+
 torch==2.0.1
 faiss-cpu==1.7.4
+
 pypdf
 numpy

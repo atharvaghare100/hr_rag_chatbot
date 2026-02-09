@@ -51,6 +51,7 @@ if process_clicked:
 
             if not all_chunks:
                  st.sidebar.error("No text could be extracted from the uploaded PDFs.")
+                
             else:
                 embeddings = embed_texts(all_chunks)
                 save_vector_store(embeddings, metadata)

@@ -1,28 +1,24 @@
 # embedder.py
-import streamlit as st
-from sentence_transformers import SentenceTransformer
 import numpy as np
+import streamlit as st
+from openai import OpenAI
 
-@st.cache_resource
-def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
-
-model = load_model()
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def embed_texts(texts):
     if not texts:
         return np.array([])
 
-    return model.encode(
-        texts,
-        convert_to_numpy=True,   # 🔑 FORCE NumPy
-        show_progress_bar=False,
-        normalize_embeddings=True
+    response = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=texts
     )
 
+    return np.array([e.embedding for e in response.data])
+
 def embed_query(query):
-    return model.encode(
-        [query],
-        convert_to_numpy=True,
-        normalize_embeddings=True
-    )[0]
+    response = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=query
+    )
+    return np.array(response.data[0].embedding)

@@ -7,6 +7,7 @@ from ingest import load_pdf_text, chunk_text
 from embedder import embed_texts
 from vector_store import save_vector_store
 from rag import generate_answer
+from evaluation import evaluate_rag
 
 st.set_page_config(page_title="HR Policy RAG Chatbot")
 

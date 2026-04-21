@@ -67,14 +67,15 @@ if st.button("Get Answer", key="get_answer_btn"):
     else:
         answer, sources = generate_answer(query)
 
-        try:
-            metrics = evaluate_rag(query, answer, sources)
-            print("\n===== RAG EVALUATION METRICS =====")
-            print(metrics)
-            print("==================================\n")
-        except Exception as e:
-            print(f"Evaluation error: {e}")
-            st.warning(f"Evaluation failed: {e}")
+        st.subheader("Answer")
+        st.write(answer)
+
+        # ✅ Print in terminal instead of UI
+        metrics = evaluate_rag(query, answer, sources)
+
+        print("\n===== RAG EVALUATION METRICS =====")
+        print(metrics)
+        print("==================================\n")
 
         with st.expander("Source Policy Chunks"):
             for src in sources:

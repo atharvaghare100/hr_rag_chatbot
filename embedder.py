@@ -18,7 +18,7 @@ def embed_texts(texts):
 
 def embed_query(query):
     response = client.embeddings.create(
-        model="gpt-3.5-turbo",
+        model="text-embedding-3-small",
         input=query
     )
     return np.array(response.data[0].embedding)

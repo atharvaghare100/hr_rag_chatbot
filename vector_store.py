@@ -1,32 +1,42 @@
-# vector_store.py
+import streamlit as st
+from pinecone import Pinecone, ServerlessSpec
 import numpy as np
-import pickle
-import os
-from sklearn.neighbors import NearestNeighbors
 
-DB_PATH = "vector_db/store.pkl"
+# Initialize Pinecone
+pc = Pinecone(api_key=st.secrets["PINECONE_API_KEY"])
+
+INDEX_NAME = st.secrets["PINECONE_INDEX_NAME"]
+
+# Create index if not exists
+if INDEX_NAME not in pc.list_indexes().names():
+    pc.create_index(
+        name=INDEX_NAME,
+        dimension=1536,  # embedding size
+        metric="cosine",
+        spec=ServerlessSpec(cloud="aws", region="us-east-1")
+    )
+
+index = pc.Index(INDEX_NAME)
+
 
 def save_vector_store(embeddings, metadata):
-    os.makedirs("vector_db", exist_ok=True)
-    with open(DB_PATH, "wb") as f:
-        pickle.dump((embeddings, metadata), f)
+    vectors = []
 
-def load_vector_store():
-    if not os.path.exists(DB_PATH):
-        return None, None
-    with open(DB_PATH, "rb") as f:
-        return pickle.load(f)
+    for i, (emb, text) in enumerate(zip(embeddings, metadata)):
+        vectors.append({
+            "id": str(i),
+            "values": emb.tolist(),
+            "metadata": {"text": text}
+        })
 
-def create_vector_store(embeddings, metadata):
-    return embeddings, metadata
+    index.upsert(vectors)
+
 
 def search_vector_store(query_embedding, top_k=3):
-    embeddings, metadata = load_vector_store()
-    if embeddings is None:
-        return []
+    results = index.query(
+        vector=query_embedding.tolist(),
+        top_k=top_k,
+        include_metadata=True
+    )
 
-    nn = NearestNeighbors(n_neighbors=top_k, metric="cosine")
-    nn.fit(embeddings)
-
-    distances, indices = nn.kneighbors([query_embedding])
-    return [metadata[i] for i in indices[0]]
+    return [match["metadata"]["text"] for match in results["matches"]]

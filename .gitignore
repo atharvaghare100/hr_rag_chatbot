@@ -1,5 +1,12 @@
-.venv/
+# Ignore virtual environment
+venv/
+
+# Ignore secrets
+.streamlit/secrets.toml
+
+# Ignore Python cache
 __pycache__/
-vector_db/
-data/uploads/
-.env
+*.pyc
+
+# Ignore system files
+.DS_Store

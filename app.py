@@ -69,6 +69,13 @@ if st.button("Get Answer", key="get_answer_btn"):
         st.subheader("Answer")
         st.write(answer)
 
+        # ✅ Print in terminal instead of UI
+        metrics = evaluate_rag(query, answer, sources)
+
+        print("\n===== RAG EVALUATION METRICS =====")
+        print(metrics)
+        print("==================================\n")
+
         with st.expander("Source Policy Chunks"):
             for src in sources:
                 st.write(src)
